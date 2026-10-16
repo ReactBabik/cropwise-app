@@ -38,7 +38,8 @@ export function DemoPanel() {
 
   const screens: Array<{ code: string; label: string; to?: string }> = [
     { code: 'W01', label: 'Cropwise Home', to: '/' },
-    { code: 'W02', label: 'Loyalty + QR + Shop', to: '/loyalty' },
+    { code: 'W02', label: 'Loyalty + QR', to: '/loyalty' },
+    { code: 'W02b', label: 'Shop', to: '/shop' },
     { code: 'W03', label: 'Product detail', to: '/product/quantis-800ml' },
     { code: 'W04', label: 'Cart', to: '/cart' },
     { code: 'W05–06', label: 'Checkout', to: state.cart.length ? '/checkout' : undefined },

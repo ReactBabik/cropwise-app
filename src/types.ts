@@ -37,7 +37,6 @@ export interface DeliveryInfo {
   district: string;
   tehsil: string;
   village: string;
-  locationShared: boolean;
 }
 
 export interface OrderTotals {

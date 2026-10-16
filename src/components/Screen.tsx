@@ -1,5 +1,5 @@
 import { forwardRef, type ReactNode } from 'react';
-import { ChevronLeft, Info, ReceiptText, ShoppingCart } from 'lucide-react';
+import { ChevronLeft, Info, QrCode, ReceiptText, ShoppingCart, Store } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/AppStore';
 
@@ -96,9 +96,16 @@ export function AppHeader({ title, backTo, centered, right = 'cart', onInfo }: A
   );
 }
 
-/** Sticky "My orders / My cart" bar shown on the shop screens. */
-export function ShopBottomBar() {
+/**
+ * Sticky bottom bar. The second button depends on the screen:
+ *  - 'shop'    Loyalty/QR screen (W02) → "Shop now" opens the shop
+ *  - 'loyalty' Shop screen → "Loyalty points" back to the QR (the cart is already in the header)
+ *  - 'cart'    product, order and other shop screens → "My cart"
+ */
+export function ShopBottomBar({ primary = 'cart' }: { primary?: 'cart' | 'shop' | 'loyalty' }) {
   const { cartCount } = useAppStore();
+  const primaryClass =
+    'flex h-12 items-center justify-center gap-2 rounded-lg bg-brand text-[15px] font-semibold text-white';
   return (
     <nav className="grid shrink-0 grid-cols-2 gap-3 bg-white px-4 pb-5 pt-3 font-sans shadow-[0_-6px_16px_rgba(0,0,0,0.08)]">
       <Link
@@ -108,16 +115,25 @@ export function ShopBottomBar() {
         <ReceiptText className="size-5" />
         My orders
       </Link>
-      <Link
-        to="/cart"
-        className="flex h-12 items-center justify-center gap-2 rounded-lg bg-brand text-[15px] font-semibold text-white"
-      >
-        <ShoppingCart className="size-5" />
-        My cart
-        <span className="grid min-w-5 place-items-center rounded-full bg-white px-1 text-xs font-bold leading-5 text-brand">
-          {cartCount}
-        </span>
-      </Link>
+      {primary === 'shop' ? (
+        <Link to="/shop" className={primaryClass}>
+          <Store className="size-5" />
+          Shop now
+        </Link>
+      ) : primary === 'loyalty' ? (
+        <Link to="/loyalty" className={primaryClass}>
+          <QrCode className="size-5" />
+          Loyalty points
+        </Link>
+      ) : (
+        <Link to="/cart" className={primaryClass}>
+          <ShoppingCart className="size-5" />
+          My cart
+          <span className="grid min-w-5 place-items-center rounded-full bg-white px-1 text-xs font-bold leading-5 text-brand">
+            {cartCount}
+          </span>
+        </Link>
+      )}
     </nav>
   );
 }

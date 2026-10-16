@@ -47,7 +47,7 @@ export function OrderPlacedScreen() {
         <PillButton
           variant="outline"
           className="mt-3"
-          onClick={() => navigate('/loyalty?section=shop')}
+          onClick={() => navigate('/shop')}
         >
           Continue shopping
         </PillButton>

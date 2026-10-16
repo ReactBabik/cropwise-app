@@ -24,15 +24,21 @@ the left. On a phone-sized screen the app is full-bleed and the panel opens from
 | Blueprint | Route | File |
 |---|---|---|
 | W01 Cropwise Home | `/` | `src/screens/HomeScreen.tsx` |
-| W02 Loyalty + QR + Shop | `/loyalty` (`?section=shop` scrolls to the shop) | `src/screens/LoyaltyScreen.tsx`, `src/components/RedemptionQrCard.tsx`, `src/components/ProductCard.tsx` |
+| W02 Loyalty + QR | `/loyalty` | `src/screens/LoyaltyScreen.tsx`, `src/components/RedemptionQrCard.tsx` |
+| W02 Shop (split out of W02 — see note) | `/shop` | `src/screens/ShopScreen.tsx`, `src/components/ProductCard.tsx` |
 | W03 Product detail | `/product/:productId` | `src/screens/ProductScreen.tsx` |
 | W04 Cart | `/cart` | `src/screens/CartScreen.tsx` |
 | W05 Checkout · points shown, W06 Checkout · redeem all ticked | `/checkout` | `src/screens/CheckoutScreen.tsx` |
 | W07 Order placed | `/order-placed/:orderId` | `src/screens/OrderPlacedScreen.tsx` |
 | W08 My Orders | `/orders` | `src/screens/OrdersScreen.tsx` |
 | W09–W12 Status · Pending / Confirmed / Delivered / Cancelled | `/orders/:orderId` | `src/screens/OrderDetailsScreen.tsx` |
-| S01 Savera avatar + pop-up | on `/loyalty` | `src/components/SaveraBubble.tsx` |
+| S01 Savera avatar + pop-up | on `/loyalty` and `/shop` — compact 48px avatar bottom-right; hint shows once per session and fades after 5s | `src/components/SaveraBubble.tsx` |
 | S02 Ask Savera chat | `/savera` | `src/screens/SaveraScreen.tsx` |
+
+**Change from the blueprint:** the shop (crop programmes, best sellers, portfolio) is a separate screen
+from the QR. The Loyalty/QR screen's bottom bar shows **My orders · Shop now**; "Shop now" opens `/shop`.
+The shop shows **My orders · Loyalty points** (back to the QR; the cart is in the header).
+Product, order and other shop screens keep **My orders · My cart**. "Shop & Redeem" on Home also opens `/shop`.
 
 W01 and S02 are existing Cropwise screens, rebuilt only so the journey has a start and an exit.
 On W01 only the **Loyalty** card and the **Savera** tile are live.
@@ -72,6 +78,14 @@ Defined once in `src/lib/loyalty.ts`; every screen calls these functions rather 
 | Counter code | `CW-` + 6 characters, single use, 60-second life, refreshable. | W02 |
 | Payment | Cash on Delivery only. | W05 |
 
+### States the Loyalty screen handles
+
+| State | Behaviour |
+|---|---|
+| Points > 0 | Rotating counter QR + code (`RedemptionQrCard`). |
+| Zero points | **No QR.** Animated "Shop to start earning points" card with a *Start shopping* button (`EarnPointsCard`). Animation is CSS-only and stops under reduced-motion. |
+| Points couldn't load | Retry in the header; QR still shown so the farmer can earn at the counter. |
+
 ### States the checkout handles
 
 | State | Behaviour |
@@ -91,7 +105,6 @@ Search the code for `PROTOTYPE` to find every one of these.
 - **Order status** never changes by itself; the demo panel plays the back office.
 - **Catalogue**: names and prices are from the blueprint. Categories, descriptions and the product ↔ crop-programme mapping are placeholders. Product images were lifted from the blueprint PDF and are low resolution.
 - **Ask Savera** shows the greeting and returns one fixed reply. The microphone is disabled.
-- **"Current location shared"** toggles a flag; it does not read the device location.
 - **Locations** (district → tehsil → village) are a small sample list.
 - **Signed-in user** is hard-coded (Akram Hussain, 0303 259 3019). There is no login.
 
@@ -115,13 +128,12 @@ These are places where the blueprint is silent or inconsistent and the prototype
 
 1. **"Points worth more than the order"** — the prototype compares points with *subtotal + delivery*. Should it be subtotal only (i.e. can points pay for delivery)?
 2. **Order numbers** — My Orders shows `#NS-10482`, order details shows `ORD-58214`. The prototype uses `NS-` everywhere.
-3. **Confirmed timeline** — W10 shows no "Delivered" step ahead. The prototype follows that; a pending order previews only "Confirmed".
+3. **Order status stepper** — shown horizontally (Pending → Confirmed → Delivered) with steps still ahead greyed out. The blueprint's vertical W10 showed no Delivered step ahead.
 4. **Cancelled from Pending** — W12 only shows cancellation after confirmation. The prototype shows the statuses the order actually went through.
 5. **Crop Programs** — tapping one filters the Product Portfolio in the prototype. The blueprint doesn't say where it should lead.
 6. **Product categories** — Quantis is under "Fungicide" in the W03 breadcrumb although it is a biostimulant. The four portfolio tabs have no home for biostimulants/nutrition.
-7. **Is location sharing required** to place an order? The prototype treats it as optional.
-8. **Header cart badge** on order details shows "5" in the blueprint with an empty cart; the prototype shows the real cart count.
-9. **Points changing mid-checkout** (e.g. redeemed at a counter while the cart is open) — the prototype re-checks eligibility live; the server needs to reject a stale redemption.
+7. **Header cart badge** on order details shows "5" in the blueprint with an empty cart; the prototype shows the real cart count.
+8. **Points changing mid-checkout** (e.g. redeemed at a counter while the cart is open) — the prototype re-checks eligibility live; the server needs to reject a stale redemption.
 
 ## Demo panel
 
@@ -133,6 +145,6 @@ These are places where the blueprint is silent or inconsistent and the prototype
 - **Back office · order status** — Confirm / Mark delivered / Cancel each order and watch the balance move.
 - **Reset demo** — back to the seeded state.
 
-Suggested walkthrough: Home → *Shop & Redeem* → open Quantis, add 2 → add Enrich → cart → checkout →
+Suggested walkthrough: Home → *View Points* (QR) → *Shop now* → open Quantis, add 2 → add Enrich → cart → checkout →
 tick *Redeem all* → place order → My Orders → open the order → use the panel to Confirm, then
 Deliver (balance +310) or Cancel (balance +5,000).

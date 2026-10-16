@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AppHeader, Screen, ShopBottomBar } from '../components/Screen';
 import { StatusBadge } from '../components/ui';
 import { formatPhoneIntl, formatRs, pluralItems } from '../lib/format';
+import { PRODUCTS_BY_ID } from '../data/products';
 import { useAppStore } from '../store/AppStore';
 
 /** W08 · My Orders. */
@@ -29,7 +30,7 @@ export function OrdersScreen() {
                   className="flex items-center gap-3 rounded-xl bg-white p-3"
                 >
                   <img
-                    src={order.lines[0].image}
+                    src={PRODUCTS_BY_ID[order.lines[0].productId]?.image ?? order.lines[0].image}
                     alt=""
                     className="h-16 w-14 shrink-0 object-contain"
                   />

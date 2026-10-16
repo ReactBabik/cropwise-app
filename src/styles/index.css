@@ -56,3 +56,46 @@ button:disabled {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ── Zero-points card (EarnPointsCard) ── */
+@keyframes earn-coin {
+  0% { transform: translate(0, 24px) scale(0.6); opacity: 0; }
+  15% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(var(--coin-x), -78px) scale(1) rotate(12deg); opacity: 0; }
+}
+@keyframes earn-bag {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  20% { transform: translateY(-6px) rotate(-4deg); }
+  40% { transform: translateY(0) rotate(3deg); }
+  60% { transform: translateY(-3px) rotate(0); }
+}
+@keyframes earn-sparkle {
+  0%, 100% { transform: scale(0) rotate(0); opacity: 0; }
+  50% { transform: scale(1) rotate(90deg); opacity: 1; }
+}
+@keyframes earn-glow {
+  0%, 100% { transform: scale(0.92); opacity: 0.7; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+.earn-coin { animation: earn-coin 2.1s ease-out infinite both; }
+.earn-bag { animation: earn-bag 2.1s ease-in-out infinite; }
+.earn-sparkle { animation: earn-sparkle 2.4s ease-in-out infinite both; }
+.earn-glow { animation: earn-glow 3s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .earn-coin, .earn-bag, .earn-sparkle, .earn-glow { animation: none; }
+  .earn-coin { opacity: 0; }
+  .earn-sparkle { opacity: 1; }
+}
+
+/* ── Savera hint: slide in, then fade out before it unmounts (5s) ── */
+@keyframes savera-hint {
+  0% { opacity: 0; transform: translateY(6px) scale(0.96); }
+  8%, 88% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(4px); }
+}
+.savera-hint { animation: savera-hint 5s ease-out both; transform-origin: bottom right; }
+@media (prefers-reduced-motion: reduce) {
+  .savera-hint { animation: none; }
+}

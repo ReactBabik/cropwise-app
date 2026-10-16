@@ -16,12 +16,12 @@ export function ProductScreen() {
   const toast = useToast();
   const [qty, setQty] = useState(1);
 
-  if (!product) return <Navigate to="/loyalty" replace />;
+  if (!product) return <Navigate to="/shop" replace />;
 
   return (
-    <Screen header={<AppHeader title="Product" backTo="/loyalty" />} footer={<ShopBottomBar />}>
+    <Screen header={<AppHeader title="Product" backTo="/shop" />} footer={<ShopBottomBar />}>
       <nav aria-label="Breadcrumb" className="px-4 py-3 text-xs font-light text-muted">
-        <Link to="/loyalty?section=shop">Home</Link> / {product.category} /{' '}
+        <Link to="/shop">Home</Link> / {product.category} /{' '}
         <span className="text-ink">{product.name}</span>
       </nav>
 

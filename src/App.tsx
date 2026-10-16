@@ -11,13 +11,15 @@ import { OrderPlacedScreen } from './screens/OrderPlacedScreen';
 import { OrdersScreen } from './screens/OrdersScreen';
 import { ProductScreen } from './screens/ProductScreen';
 import { SaveraScreen } from './screens/SaveraScreen';
+import { ShopScreen } from './screens/ShopScreen';
 
 /** Route ↔ blueprint screen map. Keep in sync with the table in README.md. */
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomeScreen />} /> {/* W01 */}
-      <Route path="/loyalty" element={<LoyaltyScreen />} /> {/* W02 + S01 */}
+      <Route path="/loyalty" element={<LoyaltyScreen />} /> {/* W02 Loyalty + QR, S01 */}
+      <Route path="/shop" element={<ShopScreen />} /> {/* W02 Shop (split out) */}
       <Route path="/product/:productId" element={<ProductScreen />} /> {/* W03 */}
       <Route path="/cart" element={<CartScreen />} /> {/* W04 */}
       <Route path="/checkout" element={<CheckoutScreen />} /> {/* W05, W06 */}

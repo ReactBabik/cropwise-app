@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { Check, ChevronDown, MapPin } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AppHeader, Screen } from '../components/Screen';
 import { Card, PillButton, SummaryRow } from '../components/ui';
@@ -192,21 +192,6 @@ export function CheckoutScreen() {
               onChange={(village) => set({ village })}
             />
           </Field>
-
-          {/* PROTOTYPE: toggles a flag. Production should read the device location. */}
-          <button
-            type="button"
-            aria-pressed={delivery.locationShared}
-            onClick={() => set({ locationShared: !delivery.locationShared })}
-            className={`mt-3 flex h-11 w-full items-center gap-2.5 rounded-md border px-3 text-[13px] font-medium ${
-              delivery.locationShared
-                ? 'border-brand-deep/40 bg-brand-tint text-brand-deep'
-                : 'border-line text-ink'
-            }`}
-          >
-            <MapPin className="size-4" />
-            {delivery.locationShared ? 'Current location shared ✓' : 'Share current location'}
-          </button>
 
           <div className="mt-3 flex h-12 items-center justify-between rounded-md border border-brand-deep px-3 text-sm font-medium">
             Cash on Delivery

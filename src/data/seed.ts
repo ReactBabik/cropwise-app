@@ -10,7 +10,6 @@ export const DEMO_USER: DeliveryInfo = {
   district: 'Sahiwal',
   tehsil: 'Sahiwal',
   village: 'Chak 42/5L',
-  locationShared: true,
 };
 
 export const DEMO_POINTS_BALANCE = 5000;

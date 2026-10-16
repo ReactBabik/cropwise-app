@@ -1,50 +1,69 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import avatar from '../assets/savera/avatar-large.png';
+import avatar from '../assets/savera/avatar-small.png';
+
+const SEEN_KEY = 'savera-hint-seen';
+const HINT_MS = 5000;
+
+function hintAlreadySeen(): boolean {
+  try {
+    return sessionStorage.getItem(SEEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 /**
- * S01 · Savera avatar + pop-up, floating over the Loyalty page (W02).
- * The speech bubble and the avatar can be dismissed separately; both open Ask Savera (S02).
+ * S01 · Savera entry point on the Loyalty page (W02).
+ *
+ * Kept deliberately small so it never covers the QR or its buttons: a 48px avatar docked in
+ * the bottom-right corner above the bottom bar. The "Need crop advice?" hint shows once per
+ * session, sits directly above the avatar, and fades out on its own after 5 seconds.
  */
 export function SaveraBubble() {
-  const [showPopup, setShowPopup] = useState(true);
-  const [showAvatar, setShowAvatar] = useState(true);
+  const [showHint, setShowHint] = useState(() => !hintAlreadySeen());
 
-  if (!showAvatar) return null;
+  useEffect(() => {
+    if (!showHint) return;
+    try {
+      sessionStorage.setItem(SEEN_KEY, '1');
+    } catch {
+      // Without storage the hint simply shows again next visit.
+    }
+    const t = window.setTimeout(() => setShowHint(false), HINT_MS);
+    return () => window.clearTimeout(t);
+  }, [showHint]);
 
   return (
-    <div className="pointer-events-none absolute bottom-[84px] right-2 z-20 flex items-end font-sans">
-      {showPopup && (
-        <div className="pointer-events-auto relative mb-2 mr-1 rounded-2xl bg-white py-2 pl-4 pr-9 shadow-[0_4px_16px_rgba(0,0,0,0.18)]">
-          <Link to="/savera" className="block">
-            <p className="text-sm font-bold text-navy">Ask Savera</p>
-            <p className="text-[13px] text-ink/80">Need crop advice? Ask me.</p>
+    <div className="pointer-events-none absolute bottom-[88px] right-3 z-20 flex flex-col items-end gap-2 font-sans">
+      {showHint && (
+        <div className="savera-hint pointer-events-auto relative flex items-center gap-1 rounded-xl bg-navy py-1.5 pl-3 pr-1 text-white shadow-lg">
+          <Link to="/savera" className="text-xs leading-tight">
+            <span className="font-semibold">Ask Savera</span>
+            <span className="block text-white/80">Need crop advice?</span>
           </Link>
           <button
             type="button"
-            aria-label="Dismiss Ask Savera message"
-            onClick={() => setShowPopup(false)}
-            className="absolute right-1 top-1 grid size-8 place-items-center text-muted"
+            aria-label="Dismiss"
+            onClick={() => setShowHint(false)}
+            className="grid size-7 place-items-center text-white/70"
           >
             <X className="size-3.5" />
           </button>
+          {/* tail pointing at the avatar */}
+          <span className="absolute -bottom-1 right-5 size-2.5 rotate-45 bg-navy" />
         </div>
       )}
 
-      <div className="pointer-events-auto relative">
-        <Link to="/savera" aria-label="Ask Savera, AI crop advisor">
-          <img src={avatar} alt="" className="h-[84px] w-auto drop-shadow-md" />
-        </Link>
-        <button
-          type="button"
-          aria-label="Hide Savera"
-          onClick={() => setShowAvatar(false)}
-          className="absolute -right-1 -top-1 grid size-6 place-items-center rounded-full border border-line bg-white text-ink shadow"
-        >
-          <X className="size-3" />
-        </button>
-      </div>
+      <Link
+        to="/savera"
+        aria-label="Ask Savera, AI crop advisor"
+        className="pointer-events-auto relative block size-12 rounded-full ring-2 ring-white shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+      >
+        <img src={avatar} alt="" className="size-full rounded-full object-cover" />
+        <span className="absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 border-white bg-brand" />
+      </Link>
     </div>
   );
 }

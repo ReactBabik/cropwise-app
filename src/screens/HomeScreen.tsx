@@ -86,7 +86,7 @@ export function HomeScreen() {
             <ChevronRight className="ml-auto size-4" />
           </Link>
           <Link
-            to="/loyalty?section=shop"
+            to="/shop"
             className="mt-2 flex h-11 items-center justify-center rounded-md bg-brand text-[15px] font-semibold text-white"
           >
             Shop &amp; Redeem

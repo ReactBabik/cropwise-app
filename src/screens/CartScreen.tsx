@@ -14,7 +14,7 @@ export function CartScreen() {
   const showPointsHint = state.pointsLoadState === 'ready' && state.pointsBalance > 0;
 
   return (
-    <Screen header={<AppHeader title="My cart" backTo="/loyalty?section=shop" />}>
+    <Screen header={<AppHeader title="My cart" backTo="/shop" />}>
       <div className="space-y-3 px-4 pb-8 pt-4">
         <h2 className="text-[22px] font-medium">Cart</h2>
 
@@ -22,7 +22,7 @@ export function CartScreen() {
           <Card className="py-10 text-center">
             <p className="text-sm text-muted">Your cart is empty.</p>
             <Link
-              to="/loyalty?section=shop"
+              to="/shop"
               className="mt-3 inline-block text-sm font-medium text-brand-deep underline underline-offset-2"
             >
               Browse products

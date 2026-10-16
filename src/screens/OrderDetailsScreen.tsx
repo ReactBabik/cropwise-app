@@ -3,6 +3,7 @@ import { Navigate, useParams } from 'react-router-dom';
 import { AppHeader, Screen } from '../components/Screen';
 import { STATUS_LABEL, StatusBadge } from '../components/ui';
 import { formatNumber, formatPhoneLocal, formatRs } from '../lib/format';
+import { PRODUCTS_BY_ID } from '../data/products';
 import { useAppStore } from '../store/AppStore';
 import type { Order, OrderStatus } from '../types';
 
@@ -47,7 +48,7 @@ export function OrderDetailsScreen() {
             {order.lines.map((l) => (
               <li key={l.productId} className="flex items-center gap-3 text-sm">
                 <img
-                  src={l.image}
+                  src={PRODUCTS_BY_ID[l.productId]?.image ?? l.image}
                   alt=""
                   className="size-11 shrink-0 rounded-md bg-app object-contain p-0.5"
                 />
@@ -135,7 +136,8 @@ type StepState = 'done' | 'current' | 'upcoming' | 'cancelled';
 
 /**
  * One step per status the order has actually been through, so an order cancelled while
- * still pending doesn't claim it was confirmed. A pending order also previews "Confirmed".
+ * still pending doesn't claim it was confirmed. Open orders also show the steps still ahead
+ * (greyed) so the horizontal track always reads Pending → Confirmed → Delivered.
  */
 function timelineSteps(order: Order): Array<{ label: string; state: StepState }> {
   const steps = order.statusHistory.map((s, i) => ({
@@ -146,39 +148,45 @@ function timelineSteps(order: Order): Array<{ label: string; state: StepState }>
         ? 'cancelled'
         : 'current') as StepState,
   }));
-  if (order.status === 'pending') steps.push({ label: STATUS_LABEL.confirmed, state: 'upcoming' });
+  const ahead: Partial<Record<OrderStatus, OrderStatus[]>> = {
+    pending: ['confirmed', 'delivered'],
+    confirmed: ['delivered'],
+  };
+  for (const s of ahead[order.status] ?? []) steps.push({ label: STATUS_LABEL[s], state: 'upcoming' });
   return steps;
 }
 
+/** Horizontal stepper: dots joined by a track, labels underneath. */
 function StatusTimeline({ order }: { order: Order }) {
   const { status } = order;
   const steps = timelineSteps(order);
   return (
-    <ol className="mt-3">
+    <ol className="mt-4 flex">
       {steps.map((step, i) => {
         const last = i === steps.length - 1;
-        const reached = step.state !== 'upcoming';
         return (
-          <li key={step.label} className="flex gap-3">
-            <div className="flex flex-col items-center">
+          <li key={step.label} className="relative flex flex-1 flex-col items-center text-center">
+            {/* Track to the next step: from this dot's centre to the next dot's centre. */}
+            {!last && (
+              <span
+                aria-hidden="true"
+                className={`absolute left-1/2 top-[11px] h-0.5 w-full ${
+                  steps[i + 1].state === 'upcoming' ? 'bg-neutral-300' : 'bg-brand'
+                }`}
+              />
+            )}
+            <span className="relative z-10 rounded-full bg-white">
               <StepDot state={step.state} pending={status === 'pending'} final={status === 'delivered'} />
-              {!last && (
-                <span
-                  className={`my-0.5 h-6 w-0.5 ${
-                    steps[i + 1].state === 'upcoming' ? 'bg-neutral-300' : 'bg-brand'
-                  }`}
-                />
-              )}
-            </div>
+            </span>
             <span
-              className={`pt-0.5 text-sm ${
+              className={`mt-2 text-[13px] leading-tight ${
                 step.state === 'cancelled'
                   ? 'font-bold text-cancelled-fg'
                   : step.state === 'current'
                     ? `font-bold ${status === 'delivered' ? 'text-delivered-fg' : ''}`
-                    : reached
-                      ? ''
-                      : 'text-neutral-400'
+                    : step.state === 'upcoming'
+                      ? 'text-neutral-400'
+                      : ''
               }`}
               aria-current={step.state === 'current' || step.state === 'cancelled' ? 'step' : undefined}
             >
